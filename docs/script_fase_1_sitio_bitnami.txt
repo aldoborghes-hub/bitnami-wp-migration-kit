@@ -1,0 +1,2 @@
+Fase 1 – Creación de sitio Bitnami en /opt/bitnami/sites
+(ayuda placeholder)

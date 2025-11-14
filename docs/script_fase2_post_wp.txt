@@ -1,0 +1,64 @@
+Fase 2 – Ajustes post WordPress en Bitnami (permisos, FS_METHOD, PHP, All-in-One)
+
+Objetivo
+--------
+Dejar un sitio WordPress recién creado en Bitnami listo para:
+- Instalar plugins/temas sin pedir FTP (FS_METHOD=direct).
+- Tener permisos correctos (bitnami:daemon, 775/664).
+- (Opcional) Aumentar límites de PHP (upload_max_filesize, post_max_size, memory_limit...).
+- (Opcional) Subir el límite de tamaño del plugin All-in-One WP Migration (AI1WM_MAX_FILE_SIZE).
+
+Archivos implicados
+-------------------
+- Sitio base:        /opt/bitnami/sites/<dominio>
+- DocumentRoot:      /opt/bitnami/sites/<dominio>/htdocs
+- wp-config.php:     /opt/bitnami/sites/<dominio>/htdocs/wp-config.php
+- php.ini:           /opt/bitnami/php/etc/php.ini
+- All-in-One plugin: /opt/bitnami/sites/<dominio>/htdocs/wp-content/plugins/all-in-one-wp-migration/constants.php
+
+Uso básico
+----------
+1. Copiar el script a la instancia (por ejemplo, en /home/bitnami):
+
+   cd /home/bitnami
+   # subir script_fase2_post_wp.sh
+   chmod +x script_fase2_post_wp.sh
+
+2. Ejecutar ajustes mínimos (permisos + FS_METHOD):
+
+   sudo ./script_fase2_post_wp.sh --site vendeenchina.es
+
+   Esto:
+   - Ajusta propietarios a bitnami:daemon.
+   - Aplica permisos 775 (directorios) / 664 (archivos).
+   - Asegura FS_METHOD=direct en wp-config.php.
+
+Opcional: Ajustar php.ini
+-------------------------
+Para modificar límites de PHP (por ejemplo, 2048 MB upload y 1024 MB de memoria):
+
+   sudo ./script_fase2_post_wp.sh --site vendeenchina.es \
+        --php-tune --php-upload-mb 2048 --php-memory-mb 1024 --php-max-exec 300 --php-max-input 300
+
+Opcional: Ajustar el límite de All-in-One WP Migration
+------------------------------------------------------
+Si ya está instalado el plugin All-in-One WP Migration y quieres subir el límite
+de fichero importable (por ejemplo, a 2GB = 2147483648 bytes):
+
+   sudo ./script_fase2_post_wp.sh --site vendeenchina.es --ai1wm-bytes 2147483648
+
+El script modificará la constante AI1WM_MAX_FILE_SIZE en:
+   wp-content/plugins/all-in-one-wp-migration/constants.php
+(si el fichero existe).
+
+Notas
+-----
+- Este script está pensado para bitnami en /opt/bitnami con usuario 'bitnami' y grupo 'daemon'.
+- La Fase 2 asume que:
+    * La Fase 1 ya ha creado el sitio en /opt/bitnami/sites/<dominio>/htdocs.
+    * WordPress está instalado (o a punto de ser instalado) en esa ruta.
+- Después de la Fase 2, el siguiente paso típico es:
+    * Instalar All-in-One WP Migration desde el panel de WP.
+    * Importar el backup del sitio de origen.
+    * Verificar que todo funciona en HTTP.
+    * Pasar a la fase de HTTPS (certificado Let's Encrypt y redirecciones).

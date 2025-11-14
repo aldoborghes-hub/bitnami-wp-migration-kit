@@ -1,0 +1,93 @@
+Fase 3 – HTTPS y certificado Let's Encrypt (lego) en Bitnami
+
+Objetivo
+--------
+Dejar un sitio WordPress en Bitnami accesible por HTTPS, usando Let's Encrypt
+y el cliente lego, creando el VirtualHost HTTPS correspondiente.
+
+Qué hace el script
+------------------
+1. Comprueba que:
+   - Existe el sitio en /opt/bitnami/sites/<dominio>/htdocs
+   - Existe el binario de lego (por defecto /opt/bitnami/letsencrypt/lego)
+   - El stack Bitnami está en /opt/bitnami
+
+2. Ejecuta lego con los parámetros:
+   - --email=<correo>
+   - --domains=<dominio>
+   - --domains=<alias(es)>
+   - --path=/opt/bitnami/letsencrypt
+   - run  (si no había certificado previo)
+   - renew (si ya existía certificado para el dominio)
+
+3. Crea o actualiza el VirtualHost HTTPS:
+   - /opt/bitnami/apache/conf/vhosts/<dominio>-https-vhost.conf
+
+   Con:
+   - SSLCertificateFile apuntando a /opt/bitnami/letsencrypt/certificates/<dominio>.crt
+   - SSLCertificateKeyFile apuntando a /opt/bitnami/letsencrypt/certificates/<dominio>.key
+   - SSLCertificateChainFile apuntando a <dominio>.issuer.crt (si existe)
+
+4. Valida la configuración de Apache y reinicia el servicio.
+
+Uso básico
+----------
+1. Copiar el script a la instancia (p.ej. en /home/bitnami):
+
+   cd /home/bitnami
+   # subir script_fase3_post_wp.sh
+   chmod +x script_fase3_post_wp.sh
+
+2. Ejecutar la Fase 3 para un dominio:
+
+   sudo ./script_fase3_post_wp.sh --site vendeenchina.es \
+        --alias www.vendeenchina.es \
+        --email admin@vendeenchina.es
+
+3. Comprobar en el navegador:
+
+   https://vendeenchina.es/
+   https://vendeenchina.es/wp-login.php
+
+Si todo está correcto, el navegador mostrará candado/SSL válido.
+
+Redirección HTTP→HTTPS (manual)
+-------------------------------
+El script NO fuerza la redirección HTTP→HTTPS automáticamente para evitar
+modificar sin control el VirtualHost HTTP.
+
+Para forzar que todo el tráfico vaya por HTTPS, editar:
+
+  /opt/bitnami/apache/conf/vhosts/<dominio>-vhost.conf
+
+Y dentro de <VirtualHost *:80> añadir:
+
+  RewriteEngine On
+  RewriteCond %{HTTPS} !=on
+  RewriteRule ^/(.*) https://%{SERVER_NAME}/$1 [R=301,L]
+
+Después reiniciar Apache:
+
+  sudo /opt/bitnami/ctlscript.sh restart apache
+
+Relación con Fase 1 y Fase 2
+----------------------------
+- Fase 1:
+    Crea la estructura del sitio en /opt/bitnami/sites/<dominio>/htdocs
+    y el VirtualHost HTTP.
+
+- Fase 2:
+    Ajusta permisos, FS_METHOD=direct, y opcionalmente php.ini y el límite
+    de All-in-One WP Migration (AI1WM_MAX_FILE_SIZE).
+
+- Fase 3 (esta):
+    - Añade HTTPS con Let's Encrypt y lego.
+    - Crea el VirtualHost HTTPS dedicado al dominio.
+    - Deja preparada la redirección HTTP→HTTPS (paso manual que se documenta).
+
+Notas
+-----
+- Este flujo está pensado para instancias Bitnami multi-sitio en Lightsail,
+  donde los sitios se despliegan bajo /opt/bitnami/sites/<dominio>/htdocs.
+- bncert-tool NO se utiliza en este diseño; en su lugar se usa lego directamente,
+  que es más controlable y compatible con entornos multi-sitio.
