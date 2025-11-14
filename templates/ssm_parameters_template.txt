@@ -1,0 +1,5 @@
+/wp/<STAGE>/<SITE_ID>/smtp/host   = email-smtp.eu-west-1.amazonaws.com
+/wp/<STAGE>/<SITE_ID>/smtp/port   = 587
+/wp/<STAGE>/<SITE_ID>/smtp/from   = no-reply@ejemplo.com
+/wp/<STAGE>/<SITE_ID>/smtp/user   = (SecureString) usuario SMTP
+/wp/<STAGE>/<SITE_ID>/smtp/pass   = (SecureString) contraseña SMTP

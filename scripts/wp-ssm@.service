@@ -1,0 +1,16 @@
+[Unit]
+Description=Load WP SMTP params from SSM for site %i
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+Environment=SITE_ID=%i
+Environment=STAGE=prod
+Environment=REGION=eu-west-3
+Environment=AWS_PROFILE=wp-ssm
+Environment=AWS_SHARED_CREDENTIALS_FILE=/home/bitnami/.aws/credentials
+ExecStart=/usr/local/bin/wp_ssm_env.sh
+
+[Install]
+WantedBy=multi-user.target

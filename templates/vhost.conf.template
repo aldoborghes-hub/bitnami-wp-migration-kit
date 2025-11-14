@@ -1,0 +1,14 @@
+<VirtualHost *:80>
+  ServerName {{DOMAIN}}
+  ServerAlias {{ALIAS}}
+  DocumentRoot "/opt/bitnami/sites/{{DOMAIN}}/htdocs"
+
+  <Directory "/opt/bitnami/sites/{{DOMAIN}}/htdocs">
+    AllowOverride All
+    Require all granted
+    Options -Indexes +FollowSymLinks
+  </Directory>
+
+  ErrorLog  "/opt/bitnami/sites/{{DOMAIN}}/logs/error.log"
+  CustomLog "/opt/bitnami/sites/{{DOMAIN}}/logs/access.log" combined
+</VirtualHost>

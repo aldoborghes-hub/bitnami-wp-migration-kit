@@ -1,0 +1,11 @@
+/opt/bitnami/sites/
+  └── DOMINIO/
+      ├── conf/
+      │   └── vhost.conf
+      ├── htdocs/
+      │   ├── wp-admin/
+      │   ├── wp-content/
+      │   └── wp-includes/
+      └── logs/
+          ├── access.log
+          └── error.log
