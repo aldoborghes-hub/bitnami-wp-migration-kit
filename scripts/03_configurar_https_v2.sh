@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # -----------------------------------------------------------------------------
 # Script: script_fase3_post_wp.sh
+#Desarrollado por Aldo Borghes
 #
 # Objetivo (Fase 3):
 #   - Emitir o renovar certificado Let's Encrypt para un sitio Bitnami.
@@ -102,10 +103,19 @@ issue_or_renew_cert() {
   mkdir -p "$LEGO_PATH"
 
   local args=(
+
     "--email=$EMAIL"
+
     "--domains=$SITE"
+
     "--path=$LEGO_PATH"
+
+    "--http"
+
+    "--http.webroot=/opt/bitnami/apache/htdocs"
+
   )
+
 
   if [[ ${#ALIASES[@]} -gt 0 ]]; then
     for a in "${ALIASES[@]}"; do
