@@ -120,5 +120,5 @@ MIT (puedes modificarla si quieres).
 
 ## 👤 Autor
 
-Aldo — traduccioneschino.es  
+Aldo —  
 Automatización avanzada WordPress + AWS + Bitnami
